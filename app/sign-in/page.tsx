@@ -21,7 +21,6 @@ export default function SignUpPage() {
   const form = useForm<SignInForm>({
     resolver: zodResolver(signInSchema),
     defaultValues: initialValues,
-    mode: 'onBlur',
   });
 
   const { mutate, isPending } = useSignInMutation();
