@@ -8,3 +8,10 @@ export function cn(...inputs: ClassValue[]) {
 export function normalizeDBEntry(entry: unknown) {
   return JSON.parse(JSON.stringify(entry));
 }
+
+export function formatFormTags(tags: string): string[] {
+  return tags
+    .split(',')
+    .map(t => t.trim())
+    .filter(Boolean);
+}

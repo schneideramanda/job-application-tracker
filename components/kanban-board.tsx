@@ -4,6 +4,7 @@ import { Board } from '@/lib/models/models.types';
 import { AwardIcon, CalendarIcon, CheckCircle2Icon, MicIcon, XCircleIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 import DroppableColumn from './droppable-column';
+import { useBoards } from '@/hooks/useBoards';
 
 interface KanbanBoardProps {
   board: Board;
@@ -39,7 +40,9 @@ const COLUMN_CONFIG: Array<ColConfig> = [
 ];
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
-  const columns = board.columns;
+  const { columns, moveJob } = useBoards(board);
+
+  const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
 
   return (
     <div>
@@ -47,7 +50,15 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
         {columns.map((col, key) => {
           const config = COLUMN_CONFIG[key] || COLUMN_CONFIG[0];
 
-          return <DroppableColumn key={key} column={col} config={config} boardId={board._id} />;
+          return (
+            <DroppableColumn
+              key={key}
+              column={col}
+              config={config}
+              boardId={board._id}
+              sortedColumns={sortedColumns}
+            />
+          );
         })}
       </div>
     </div>
