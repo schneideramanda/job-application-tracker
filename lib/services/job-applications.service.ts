@@ -6,6 +6,7 @@ import {
   getJobById,
   getJobsInColumn,
   getMaxOrderInColumn,
+  removeJobById,
   removeJobFromColumn,
   shiftJobOrdersDown,
   shiftJobOrdersUp,
@@ -90,6 +91,15 @@ export async function updateJobApplication(id: string, updates: UpdateJobData) {
       : {};
 
   return updateJobById(id, { ...fields, ...positionUpdates });
+}
+
+export async function deleteJobApplication(jobId: string, columnId: string) {
+  const job = await getJobById(jobId);
+  if (!job) throw new AppError('Job application not found', 404);
+
+  await removeJobById(jobId, columnId);
+
+  return job;
 }
 
 async function resolveColumnMove(

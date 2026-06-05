@@ -8,6 +8,7 @@ import { normalizeDBEntry } from '../utils';
 import {
   createJobApplication as createJobApplicationService,
   updateJobApplication as updateJobApplicationService,
+  deleteJobApplication as deleteJobApplicationService,
 } from '../services/job-applications.service';
 
 export interface CreateJobApplicationInput {
@@ -36,9 +37,7 @@ export interface UpdateJobApplicationInput {
   columnId?: string;
 }
 
-export async function createJobApplication(
-  input: CreateJobApplicationInput,
-): Promise<ActionResult<ReturnType<typeof normalizeDBEntry>>> {
+export async function createJobApplication(input: CreateJobApplicationInput) {
   return withActionHandler(async () => {
     const session = await requireSession();
     await connectDB();
@@ -50,13 +49,9 @@ export async function createJobApplication(
   });
 }
 
-export async function updateJobApplication(
-  id: string,
-  updates: UpdateJobApplicationInput,
-): Promise<ActionResult<ReturnType<typeof normalizeDBEntry>>> {
+export async function updateJobApplication(id: string, updates: UpdateJobApplicationInput) {
   return withActionHandler(async () => {
     const session = await requireSession();
-    await connectDB();
 
     const job = await updateJobApplicationService(id, updates);
 
@@ -64,5 +59,17 @@ export async function updateJobApplication(
 
     revalidatePath('/dashboard');
     return normalizeDBEntry(job);
+  });
+}
+
+export async function deleteJobApplication(jobId: string, columnId: string) {
+  return withActionHandler(async () => {
+    const session = await requireSession();
+
+    const job = await deleteJobApplicationService(jobId, columnId);
+
+    if (job.userId !== session.user.id) throw new AppError('Unauthorized', 401);
+
+    revalidatePath('/dashboard');
   });
 }

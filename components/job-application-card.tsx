@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Button } from './ui/button';
-import { updateJobApplication } from '@/lib/actions/job-applications.actions';
+import { deleteJobApplication, updateJobApplication } from '@/lib/actions/job-applications.actions';
 import CreateJobApplicationDialog from './job-dialog/create-job-dialog';
 import { JobDialogForm } from './job-dialog/schema';
 import { useState } from 'react';
@@ -45,9 +45,17 @@ export default function JobApplicationCard({ job, columns }: JobApplicationCardP
 
   async function handleMove(newColumnId: string) {
     try {
-      const result = await updateJobApplication(job._id, {
+      await updateJobApplication(job._id, {
         columnId: newColumnId,
       });
+    } catch (err) {
+      console.error('Failed to move job application: ', err);
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      await deleteJobApplication(job._id, job.columnId ?? '');
     } catch (err) {
       console.error('Failed to move job application: ', err);
     }
@@ -110,7 +118,7 @@ export default function JobApplicationCard({ job, columns }: JobApplicationCardP
                         ))}
                     </>
                   )}
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDelete}>
                     <Trash2 className="h-4 w-4" />
                     Delete
                   </DropdownMenuItem>

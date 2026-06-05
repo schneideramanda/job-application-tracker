@@ -25,6 +25,14 @@ export async function updateJobById(id: string, updates: Record<string, unknown>
   return JobApplication.findByIdAndUpdate(id, updates, { new: true });
 }
 
+export async function removeJobById(jobId: string, columnId: string) {
+  await Column.findByIdAndUpdate(columnId, {
+    $pull: { jobApplications: jobId },
+  });
+
+  await JobApplication.deleteOne({ _id: jobId });
+}
+
 export async function shiftJobOrdersUp(jobs: { _id: unknown; order: number }[]) {
   if (!jobs.length) return;
   await JobApplication.bulkWrite(
