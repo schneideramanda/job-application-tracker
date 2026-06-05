@@ -1,66 +1,71 @@
 'use client';
 
 import { Board } from '@/lib/models/models.types';
-import { AwardIcon, CalendarIcon, CheckCircle2Icon, MicIcon, XCircleIcon } from 'lucide-react';
-import { ReactNode } from 'react';
 import DroppableColumn from './droppable-column';
-import { useBoards } from '@/hooks/useBoards';
+import {
+  closestCorners,
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { useKanbanBoard } from '@/hooks/useKanbanBoard';
+import { COLUMN_CONFIG } from '@/constants/columns';
+import { useId } from 'react';
+import JobApplicationCard from './job-application-card';
 
 interface KanbanBoardProps {
   board: Board;
   userId: string;
 }
 
-export interface ColConfig {
-  color: string;
-  icon: ReactNode;
-}
-
-const COLUMN_CONFIG: Array<ColConfig> = [
-  {
-    color: 'bg-cyan-500',
-    icon: <CalendarIcon className="h-4 w-4" />,
-  },
-  {
-    color: 'bg-purple-500',
-    icon: <CheckCircle2Icon className="h-4 w-4" />,
-  },
-  {
-    color: 'bg-green-500',
-    icon: <MicIcon className="h-4 w-4" />,
-  },
-  {
-    color: 'bg-yellow-500',
-    icon: <AwardIcon className="h-4 w-4" />,
-  },
-  {
-    color: 'bg-red-500',
-    icon: <XCircleIcon className="h-4 w-4" />,
-  },
-];
-
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
-  const { columns, moveJob } = useBoards(board);
+  const { activeId, sortedColumns, handleDragStart, handleDragEnd } = useKanbanBoard(board);
+  const id = useId();
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
 
-  const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
+  const activeJob = sortedColumns
+    .flatMap(col => col.jobApplications || [])
+    .find(job => job._id === activeId);
 
   return (
-    <div>
-      <div>
-        {columns.map((col, key) => {
-          const config = COLUMN_CONFIG[key] || COLUMN_CONFIG[0];
+    <DndContext
+      id={id}
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}>
+      <div className="space-y-4">
+        <div className="flex gap-4 pb-4 overflow-x-auto">
+          {sortedColumns.map((col, key) => {
+            const config = COLUMN_CONFIG[key] || COLUMN_CONFIG[0];
 
-          return (
-            <DroppableColumn
-              key={key}
-              column={col}
-              config={config}
-              boardId={board._id}
-              sortedColumns={sortedColumns}
-            />
-          );
-        })}
+            return (
+              <DroppableColumn
+                key={key}
+                column={col}
+                config={config}
+                boardId={board._id}
+                sortedColumns={sortedColumns}
+              />
+            );
+          })}
+        </div>
       </div>
-    </div>
+      <DragOverlay>
+        {activeJob ? (
+          <div className="opacity-50">
+            <JobApplicationCard job={activeJob} columns={sortedColumns} />
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }

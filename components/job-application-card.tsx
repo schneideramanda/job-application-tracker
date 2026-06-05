@@ -11,11 +11,12 @@ import { Button } from './ui/button';
 import { deleteJobApplication, updateJobApplication } from '@/lib/actions/job-applications.actions';
 import CreateJobApplicationDialog from './job-dialog/create-job-dialog';
 import { JobDialogForm } from './job-dialog/schema';
-import { useState } from 'react';
+import { HTMLAttributes, useState } from 'react';
 
 interface JobApplicationCardProps {
   job: JobApplication;
   columns: Column[];
+  dragHandleProps?: HTMLAttributes<HTMLElement>;
 }
 
 function toJobDialogForm(job: JobApplication): JobDialogForm {
@@ -40,7 +41,11 @@ function toJobDialogForm(job: JobApplication): JobDialogForm {
   return { ...base, ...mapped };
 }
 
-export default function JobApplicationCard({ job, columns }: JobApplicationCardProps) {
+export default function JobApplicationCard({
+  job,
+  columns,
+  dragHandleProps,
+}: JobApplicationCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   async function handleMove(newColumnId: string) {
@@ -63,7 +68,9 @@ export default function JobApplicationCard({ job, columns }: JobApplicationCardP
 
   return (
     <>
-      <Card className="cursor-pointer transition-shadow hover:shadow-lg group shadow-sm">
+      <Card
+        className="cursor-pointer transition-shadow hover:shadow-lg group shadow-sm"
+        {...dragHandleProps}>
         <CardContent className="p-4">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">

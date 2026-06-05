@@ -15,3 +15,7 @@ export function formatFormTags(tags: string): string[] {
     .map(t => t.trim())
     .filter(Boolean);
 }
+
+export function sortByOrder<T extends { order: number }>(data: T[]): T[] {
+  return [...data].sort((a, b) => a.order - b.order);
+}

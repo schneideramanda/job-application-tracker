@@ -61,13 +61,12 @@ job-application-tracker/
 ├── components/                 # React components
 │   ├── ui/                     # Reusable UI components
 │   └── kanban-board.tsx        # Main Kanban component
-├── actions/                    # Layer 1 — Server actions
-│   └── job-application.actions.ts
-├── services/                   # Layer 2 — Business logic
-│   └── job-application.service.ts
-├── repositories/               # Layer 3 — Database access
-│   └── job-application.repo.ts
+├── constants/                  # Static data
+├── hooks/                      # Custom hooks
 ├── lib/
+│   ├── actions/                # Layer 1 — Server actions
+│   ├── services/               # Layer 2 — Business logic
+│   ├── repositories/           # Layer 3 — Database access
 │   ├── auth/
 │   │   ├── auth.ts             # Authentication setup
 │   │   └── require-session.ts  # Session guard used by actions
